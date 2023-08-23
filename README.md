@@ -49,10 +49,3 @@ Here's an example of how the program works:
 5. Enter capacity of compartment 3: 1800.0
 6. Confirm the information.
 7. The program will display the DataFrame and save it to "Gather_Trailer_Info.xlsx".
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-Feel free to use, modify, and distribute this program according to the terms of the MIT License.
-```
