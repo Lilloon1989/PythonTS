@@ -1,160 +1,68 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+import pandas as pd
+import os
 
-# C extensions
-*.so
+def confirm_compartments(total_compartments):
+    compartment_capacities = []
+    
+    for i in range(total_compartments):
+        capacity = float(input("What is the capacity of compartment " + str(i+1) + ": "))
+        compartment_capacities.append(capacity)
+    
+    return compartment_capacities
 
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+def confirm_trailer_info():
+    thank_you = "Thank you for your information"
+    
+    trailer_id = input("What is your trailer ID? ")
+    print("Your Trailer ID:", trailer_id)
+    
+    confirm_id = input("Is this correct? Y/N: ")
+    if confirm_id == "Y":
+        total_compartments = int(input("How many compartments does your trailer have? "))
+        print("Your Trailer ID:", trailer_id, "\nTotal Compartments:", total_compartments)
+        
+        confirm_info = input("Is this information correct? Y/N: ")
+        if confirm_info == "Y":
+            print(thank_you)
+            compartment_capacities = confirm_compartments(total_compartments)
+            return trailer_id, total_compartments, compartment_capacities
+        elif confirm_info == "N":
+            print("Oops! Okay, let's correct the number of compartments.")
+            return confirm_trailer_info()
+        else:
+            print("Please enter Y or N")
+            return confirm_trailer_info()
+    elif confirm_id == "N":
+        print("Okay, let's start over!")
+        return confirm_trailer_info()
+    else:
+        print("Please try again and enter Y or N")
+        return confirm_trailer_info()
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
+# Load existing DataFrame if the Excel file exists
+excel_file = "Gather_Trailer_Info.xlsx"
+if os.path.exists(excel_file):
+    existing_df = pd.read_excel(excel_file)
+else:
+    existing_df = pd.DataFrame()
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+# Call the function to gather trailer information
+trailer_id, total_compartments, compartment_capacities = confirm_trailer_info()
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-cover/
+# Create dictionary for DataFrame
+new_trailer = {
+    "Trailer ID": [trailer_id],
+    "Total Compartments": [total_compartments]
+}
+for i, capacity in enumerate(compartment_capacities, start=1):
+    new_trailer[f"Compartment {i}"] = [capacity]
 
-# Translations
-*.mo
-*.pot
+# Append the new trailer information to the existing DataFrame
+new_df = pd.DataFrame(new_trailer)
+updated_df = pd.concat([existing_df, new_df], ignore_index=True)
 
-# Django stuff:
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
+# Save the updated DataFrame to an Excel file with a specific sheet name
+updated_df.to_excel(excel_file, sheet_name="Trailer Info", index=False)
 
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Scrapy stuff:
-.scrapy
-
-# Sphinx documentation
-docs/_build/
-
-# PyBuilder
-.pybuilder/
-target/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-#   For a library or package, you might want to ignore these files since the code is
-#   intended to run in multiple environments; otherwise, check them in:
-# .python-version
-
-# pipenv
-#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
-#   However, in case of collaboration, if having platform-specific dependencies or dependencies
-#   having no cross-platform support, pipenv may install dependencies that don't work, or not
-#   install all needed dependencies.
-#Pipfile.lock
-
-# poetry
-#   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
-#   This is especially recommended for binary packages to ensure reproducibility, and is more
-#   commonly ignored for libraries.
-#   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
-#poetry.lock
-
-# pdm
-#   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
-#pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/#use-with-ide
-.pdm.toml
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
-__pypackages__/
-
-# Celery stuff
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# Pyre type checker
-.pyre/
-
-# pytype static type analyzer
-.pytype/
-
-# Cython debug symbols
-cython_debug/
-
-# PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#.idea/
+# Print the updated DataFrame
+print(updated_df)
